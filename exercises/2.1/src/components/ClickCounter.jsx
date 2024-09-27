@@ -15,7 +15,6 @@ const ClickCounter = ({ title, message, hovermsg}) => {
                 onClick={() => setCount(count + 1)}
             >
             {hover ? "Please click on me now !" : hovermsg}
-                Click me
             </button>
         </div>
     );
