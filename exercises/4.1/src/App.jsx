@@ -40,7 +40,6 @@ const App = () => {
         </div>
         <div>
           <button type="submit">add</button>
-          <div>debug: {newName} - {newPhone}</div>
         </div>
       </form>
       <h2>Numbers</h2>
