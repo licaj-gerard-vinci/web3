@@ -1,10 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { names: 'Arto Hellas', phone:'0842080'}
-  ]) 
-
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
 
@@ -16,16 +14,36 @@ const App = () => {
     setNewPhone(event.target.value)
   }
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
+
   const addPerson = (event) => {
     event.preventDefault()
-    if (persons.find(persons => persons.names === newName)) {
+    if (persons.find(person => person.names === newName)) {
       alert(`${newName} is already added to phonebook`)
+    } else {
+      const newPerson = { id: persons.length + 1, names: newName, phone: newPhone }
+      axios
+        .post('http://localhost:3001/persons', newPerson)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setNewName("")
+          setNewPhone("")
+        })
     }
-    else {
-        setPersons(persons.concat({names: newName, phone:newPhone}))
-        setNewName("")
-        setNewPhone("")
-    }
+  }
+
+  const deletePerson = (id) => {
+    axios
+      .delete(`http://localhost:3001/persons/${id}`)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
   }
 
   return (
@@ -44,9 +62,14 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {persons.map(person => <li key={person.names}>{person.names} {person.phone}</li>)}
+        {persons.map(person => (
+          <li key={person.id}>
+            {person.names} {person.phone}
+            <button onClick={() => deletePerson(person.id)}>delete</button>
+          </li>
+        ))}
       </ul>
-      </div>
+    </div>
   )
 }
 
